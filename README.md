@@ -1,2 +1,2 @@
-# florida_replication
-Replication scripts for Florida canvassing study
+# Replication scripts
+Replication scripts for ``Canvassing with chatbots: personalized messaging using natural language processing to change attitudes.''
