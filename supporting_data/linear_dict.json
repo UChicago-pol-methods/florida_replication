@@ -1,0 +1,449 @@
+{
+  "Welcome": {
+    "1": {
+      "text":"Do you want to get started with the study?",
+      "quick_reply":"Yes",
+    "redirection_section":"Consent",
+    "redirection_id":"1"
+     }
+   },
+  "Consent": {
+    "1": {
+      "text":"The text at this link addresses our informed consent procedures. You can access this text at any time at: https://dfsresearch.page.link/consent",
+      "quick_reply":"Continue",
+      "redirection_section":"Consent",
+      "redirection_id": 2
+     },
+    "2": {
+      "text":"If you have any questions, concerns or complaints about this research, its procedures, risks and benefits, contact the Protocol Director, Molly Offer-Westort at (207) 370-5278‬, or dataforsociety@uchicago.edu.",
+      "quick_reply":"Continue",
+      "redirection_section":"Consent",
+      "redirection_id": 3
+     },
+    "3": {
+      "text":"If you would like to exit the survey at any time, please type in Quit Survey.",
+      "quick_reply":"Continue",
+      "redirection_section":"Consent",
+      "redirection_id": 4
+     },
+    "4": {
+      "text":"If you agree to participate in this research, you must confirm you are 18 years or older, and currently reside in the United States. Please note that this survey is for research purposes only, and is not paid. \nDo you wish to participate in this study?",
+      "quick_reply": "[Yes, No]",
+      "redirection_section": "[Panel1, Nonconsent]",
+      "redirection_id": "[1, 1]"
+     }
+   },
+  "Nonconsent": {
+    "1": {
+      "text":"You have decided not to participate in this study. Thank you for your time.",
+      "redirection_section":"Nonconsent",
+      "redirection_id": 2
+     },
+    "2": {
+      "text":"If you have any questions, concerns or complaints about this research, its procedures, risks and benefits, contact the Protocol Director, Molly Offer-Westort at (207) 370-5278‬, or dataforsociety@uchicago.edu.",
+      "redirection_section":"Nonconsent",
+      "redirection_id": 2
+     }
+   },
+  "Panel1": {
+    "1": {
+      "text":"We would like to get your views on a few issues.",
+      "quick_reply":"Continue",
+      "redirection_section":"Panel1",
+      "redirection_id": 2
+     },
+    "2": {
+      "text":"When it comes to your political views, how would you describe yourself?\n\n1. Very Liberal\n2. Liberal\n3. Somewhat Liberal\n4. Middle of the Road\n5. Somewhat Conservative\n6. Conservative\n7. Very Conservative\n8. Not sure",
+      "quick_reply":"[1, 2, 3, 4, 5, 6, 7, 8]",
+      "redirection_section":"Panel1",
+      "redirection_id": 3
+     },
+    "3": {
+      "text":"Generally speaking, do you consider yourself a...\n1. Strong Democrat\n2. Not very strong Democrat\n3. Closer to the Democratic Party\n4. Not closer to either party\n5. Closer to the Republican Party\n6. Not very strong Republican\n7. Strong Republican",
+      "quick_reply":"[1, 2, 3, 4, 5, 6, 7]",
+      "redirection_section":"Panel1",
+      "redirection_id": 4
+     },
+    "4": {
+      "text":"How interested are you in politics?\n1. Very much interested\n2. Somewhat interested\n3. Not much interested\n4. Not sure",
+      "quick_reply":"[1, 2, 3, 4]",
+      "redirection_section":"Panel1",
+      "redirection_id": 5
+     },
+    "5": {
+      "text":"How old are you?",
+      "redirection_section":"Panel1",
+      "redirection_id": 6
+     },
+    "6": {
+      "text":"Do you describe yourself as a man, a woman, or in some other way?",
+      "quick_reply":"[Man, Woman, Something else]",
+      "redirection_section":"Panel1",
+      "redirection_id": 7
+     },
+    "7": {
+      "text":"Which comes closest to your view about providing health care in the United States?\n1. The Government should provide everyone with health care and pay for it with tax dollars.\n2. Companies should be required to provide health insurance for their employees and the government should provide subsidies for those who are not working or retired.\n3. Health insurance should be voluntary. Individuals should either buy insurance or obtain it through their employers as they do currently. The elderly and the very poor should be covered by Medicare and Medicaid as they are currently.\n4. I'm not sure, I haven't thought much about this.",
+      "quick_reply":"[1, 2, 3, 4]",
+      "redirection_section":"Panel1",
+      "redirection_id": 8
+     },
+    "8": {
+      "text":"Should the federal government take actions to slow the effects of climate change and global warming even if it costs some jobs and makes life inconvenient for Americans or should maintaining jobs and our standard of living be given priority? Between the two positions below, on a scale of 0 to 10, where would you put yourself? You can pick any number between 0 and 10. \n\n0: The federal government should take actions to slow the effects of climate change\n10: Maintaining jobs and standard of living should be given priority",
+      "quick_reply":"[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
+      "redirection_section":"Panel1",
+      "redirection_id": 9
+     },
+    "9": {
+      "text":"Would you say your religion provides some guidance in your day-to-day living, quite a bit of guidance, or a great deal of guidance in your day-to-day life?\n1. Some guidance\n2. Quite a bit of guidance\n3. A great deal of guidance\n4. Don't know",
+      "quick_reply":"[1, 2, 3, 4]",
+      "redirection_section":"Panel1",
+      "redirection_id": 10
+     },
+    "10": {
+      "text":"Under what circumstances should abortion be legal?\n1. Abortion should always be legal. There should be no restrictions on abortion.\n2. Abortion should be legal, but with some restrictions (such as for minors or late-term abortions). \n3. Abortion should only be legal in special circumstances, such as when the life of the mother is in danger.\n4. Abortion should be illegal. It should never be allowed.\n5. I'm not sure, I haven't thought much about this.",
+      "quick_reply":"[1, 2, 3, 4, 5]",
+      "redirection_section":"Panel1",
+      "redirection_id": 11
+     },
+    "11": {
+      "text":"Which comes closest to your view about illegal immigration?\n1. Illegal immigrants should be arrested and deported as quickly as possible, regardless of their circumstances.\n2. Illegal immigrants now living in the U.S. should be allowed to become citizens if they pay a fine and meet other requirements.\n3. I'm not sure, I haven't thought much about this.",
+      "quick_reply":"[1, 2, 3]",
+      "redirection_section": "[Control, Context]",
+      "redirection_id": "[1, 1]"
+     }
+   },
+  "Control": {
+    "1": {
+      "text":"For this survey, we're talking to potential voters in Florida about several policy issues. One issue is a new law in Florida that requires additional safety regulations for boating teachers and instructors, called Ethan's law. Have you heard about this?",
+      "quick_reply": "[Yes, No, Don't know]",
+      "redirection_section":"Control",
+      "redirection_id": 2
+     },
+    "2": {
+      "text":"Here is a short news clip on the rule.",
+      "quick_reply": "Play the news clip",
+      "redirection_section":"Control",
+      "redirection_id": 3
+     },
+    "3": {
+      "text":"1207751636493718",
+      "quick_reply": "I've finished watching",
+      "redirection_section": "[Control, Control]",
+      "redirection_id": "[4.1, 4.2]"
+     },
+    "4.1": {
+      "text":"With the information that you have, would you vote in favor or against additional safety regulations for boating instructors?",
+      "quick_reply": "[Against, In favor, Undecided/Don't know]",
+      "redirection_section":"Positions",
+      "redirection_id": 1
+     },
+    "4.2": {
+      "text":"With the information that you have, would you vote in favor or against additional safety regulations for boating instructors?",
+      "quick_reply": "[In favor, Against, Undecided/Don't know]",
+      "redirection_section":"Positions",
+      "redirection_id": 1
+     }
+   },
+  "Context": {
+    "1": {
+      "text":"For this survey, We're talking to potential voters in Florida about several policy issues. One issue is a new rule that will deny Medicaid coverage for gender-affirming care for both transgender youth and adults. Have you heard about this?",
+      "quick_reply": "[Yes, No, Don't know]",
+      "redirection_section":"Context",
+      "redirection_id": 2
+     },
+    "2": {
+      "text":"Here is a short news clip on the rule.",
+      "quick_reply": "Play the news clip",
+      "redirection_section":"Context",
+      "redirection_id": 3
+     },
+    "3": {
+      "text":"1406695009736563",
+      "quick_reply": "I've finished watching",
+      "redirection_section": "[Context, Context]",
+      "redirection_id": "[4.1, 4.2]"
+     },
+    "4.1": {
+      "text":"With the information that you have, would you vote in favor or against including gender-affirming care in Medicaid coverage?",
+      "quick_reply": "[Against (exclude), In favor (include), Undecided/Don't know]",
+      "redirection_section":"Context",
+      "redirection_id": 5
+     },
+    "4.2": {
+      "text":"With the information that you have, would you vote in favor or against including gender-affirming care in Medicaid coverage?",
+      "quick_reply": "[In favor (include), Against (exclude), Undecided/Don't know]",
+      "redirection_section":"Context",
+      "redirection_id": 5
+     },
+    "5": {
+      "text":"To be more specific, on this 0-10 scale, where 0 is 100% sure you'd vote to exclude gender-affirming care in Medicaid coverage and 10 is 100% sure you'd vote to include, where would you put yourself?",
+      "quick_reply": "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
+      "redirection_section":"Video",
+      "redirection_id": 1
+     }
+   },
+  "Video": {
+    "1": {
+      "text":"It can be hard to understand what it means to be transgender, especially if you've never met a transgender person. Some are opposed to these rules. Here's a short news clip that gives more information. ",
+      "quick_reply": "Play the news clip",
+      "redirection_section":"Video",
+      "redirection_id": 2
+     },
+    "2": {
+      "text":"882302559770721",
+      "quick_reply": "I've finished watching",
+      "redirection_section":"Video",
+      "redirection_id": 3
+     },
+    "3": {
+      "text":"Now that you've seen that video, where 0 is 100% sure you'd vote to exclude gender-affirming care in Medicaid coverage and 10 is 100% sure you'd vote to include, where would you put yourself?",
+      "quick_reply":"[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
+      "redirection_section": "[Video, Video]",
+      "redirection_id": "[4, 6]"
+     },
+    "4": {
+      "text":"Why is that the right number for you? ",
+      "redirection_section":"Video",
+      "redirection_id": 5
+     },
+    "5": {
+      "text":"When you have finished entering text, please type in OK on a new line",
+      "redirection_section":"[Video, Video]",
+      "redirection_id": "[5, 6]"
+     },
+    "6": {
+      "text":"What is on either side of the issue for you? What does this video make you think about?",
+      "redirection_section":"Video",
+      "redirection_id": 7
+     },
+    "7": {
+      "text":"When you have finished entering text, please type in OK on a new line",
+      "redirection_section":"[Video, Define]",
+      "redirection_id": "[7, 1]"
+     }
+   },
+  "Define": {
+    "1": {
+      "text":"As you saw in the video, Juniper is a 23-year old transgender woman who lives in Florida.",
+      "quick_reply":"Continue",
+      "redirection_section":"Define",
+      "redirection_id": 2
+     },
+    "2": {
+      "text":"Do you know anyone transgender?",
+      "quick_reply": "[Yes, No, Don't know]",
+      "redirection_section": "[Define, Define, Define]",
+      "redirection_id": "[3, 6, 6]"
+     },
+    "3": {
+      "text":"How do you know this person?",
+      "redirection_section":"Define",
+      "redirection_id": 4
+     },
+    "4": {
+      "text":"Did your feelings about them change when you learned that they were transgender?",
+      "redirection_section":"Define",
+      "redirection_id": 5
+     },
+    "5": {
+      "text":"When you have finished entering text, please type in OK on a new line",
+      "redirection_section": "[Define, Flexible]",
+      "redirection_id": "[5, 1]"
+     },
+    "6": {
+      "text":"Do you know anyone gay or lesbian?",
+      "quick_reply": "[Yes, No, Don't know]",
+      "redirection_section": "[Define, Flexible, Flexible]",
+      "redirection_id": "[7, 1, 1]"
+     },
+    "7": {
+      "text":"How do you know this person?",
+      "redirection_section":"Define",
+      "redirection_id": 8
+     },
+    "8": {
+      "text":"Did your feelings about them change when you learned that they were gay or lesbian?",
+      "redirection_section":"Define",
+      "redirection_id": 9
+     },
+    "9": {
+      "text":"When you have finished entering text, please type in OK on a new line",
+      "redirection_section":"[Define, Flexible]",
+      "redirection_id": "[9, 1]"
+     }
+   },
+  "Flexible": {
+    "1": {
+      "text":"How did you feel listening to the video with Juniper?",
+      "redirection_section":"Flexible",
+      "redirection_id": 2
+     },
+    "2": {
+      "text":"Did the video bring up any questions or concerns for you?",
+      "redirection_section":"Flexible",
+      "redirection_id": 3
+     },
+     
+    "3": {
+      "text":"When you have finished entering text, please type in OK on a new line",
+      "redirection_section": "[Flexible, Address, Address]",
+      "redirection_id": "[3, 1, 2]"
+     }
+   },
+  "Address": {
+    "1": {
+      "text":"Earlier you mentioned {{concern_category}} as a concern. What is on your mind now? What are you picturing will actually happen?",
+      "redirection_section":"Address",
+      "redirection_id": 2
+     },
+    "2": {
+      "text":"Because so many people don't know someone who is transgender, a lot of questions and concerns can come up.",
+      "quick_reply":"Continue",
+      "redirection_section":"Address",
+      "redirection_id": 3
+     },
+    "3": {
+      "text":"Here is some information from the National Center for Transgender Equality:",
+      "quick_reply":"Continue",
+      "redirection_section":"Address",
+      "redirection_id": 4
+     },
+    "4": {
+      "text":"{{concern_response}}",
+      "quick_reply":"Continue",
+      "redirection_section":"Address",
+      "redirection_id": 5
+     },
+    "5": {
+      "text":"Did this response address your question or concern?",
+      "redirection_section":"Address",
+      "redirection_id": 6
+     },
+    "6": {
+      "text":"Thinking back to the video, do you think Juniper's hormone therapy should be covered by Medicaid? Why?",
+      "redirection_section":"Address",
+      "redirection_id": 7
+     },
+    "7": {
+      "text":"When you have finished entering text, please type in OK on a new line",
+      "redirection_section":"[Address, Address]",
+      "redirection_id": "[7, 8]"
+     },
+    "8": {
+      "text":"All of us including transgender people care about health coverage and care for everyone. \n\nMedicaid in 34 US states and territories explicitly covers transgender health coverage and transition-related health care.",
+      "quick_reply":"Continue",
+      "redirection_section":"Positions",
+      "redirection_id": 1
+     }
+   },
+  "Positions": {
+    "1": {
+      "text":"Updates to the the Florida State Medicaid policy will exclude gender-affirming care in state Medicaid coverage. Do you favor or oppose this new policy?\n1. Strongly favor\n2. Favor\n3. Somewhat favor\n4. Neither favor nor oppose\n5. Somewhat oppose\n6. Oppose\n7. Strongly oppose",
+      "quick_reply":"[1, 2, 3, 4, 5, 6, 7]",
+      "redirection_section":"Positions",
+      "redirection_id": 2
+     },
+    "2": {
+      "text":"Some people say it's important to provide gender-affirming health care to transgender people. Other people have concerns about the risks with this type of health care, and do not want gender-affirming care for transgender people included in our state Medicaid coverage. What do you think? Do you agree or disagree that Florida policy should protect transgender people from discrimination?\n1. Strongly agree\n2. Agree\n3. Somewhat agree\n4. Neither agree nor disagree\n5. Somewhat disagree\n6. Disagree\n7. Strongly disagree",
+      "quick_reply":"[1, 2, 3, 4, 5, 6, 7]",
+      "redirection_section":"Positions",
+      "redirection_id": 3
+     },
+    "3": {
+      "text":"Do you favor raising federal taxes on families earning more than $200,000 per year? \n1. Strongly Favor\n2. Somewhat Favor\n3. Somewhat Oppose\n4. Strongly Oppose\n5. I'm not sure, I haven't thought much about this.",
+      "quick_reply":"[1, 2, 3, 4, 5]",
+      "redirection_section":"Positions",
+      "redirection_id": 4
+     },
+    "4": {
+      "text":"How do you feel towards transgender people? The higher the number, the warmer or more favorable you feel toward that person, the lower the number, the colder or less favorable you feel. You can pick any number between 0 and 10.",
+      "quick_reply":"[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
+      "redirection_section":"Positions",
+      "redirection_id": 5
+     },
+    "5": {
+      "text":"Please tell us whether you agree, disagree, or don't have a position on the following statements",
+      "quick_reply":"Continue",
+      "redirection_section":"Positions",
+      "redirection_id": 6
+     },
+    "6": {
+      "text":"Marijuana should be legalized.",
+      "quick_reply":"[Agree, Disagree, Undecided/Don't know]",
+      "redirection_section":"Positions",
+      "redirection_id": 7
+     },
+    "7": {
+      "text":"The federal minimum wage should be raised to $15 an hour.",
+      "quick_reply":"[Agree, Disagree, Undecided/Don't know]",
+      "redirection_section":"Positions",
+      "redirection_id": 8
+     },
+    "8": {
+      "text":"I would support a friend choosing to have a sex change.",
+      "quick_reply":"[Agree, Disagree, Undecided/Don't know]",
+      "redirection_section":"Positions",
+      "redirection_id": 9
+     },
+    "9": {
+      "text":"It is morally wrong for a man to present himself as a woman in public.",
+      "quick_reply":"[Agree, Disagree, Undecided/Don't know]",
+      "redirection_section":"Positions",
+      "redirection_id": 10
+     },
+    "10": {
+      "text":"A man who identifies as a woman is psychologically abnormal.",
+      "quick_reply":"[Agree, Disagree, Undecided/Don't know]",
+      "redirection_section":"Positions",
+      "redirection_id": 11
+     },
+    "11": {
+      "text":"Saying you are a gender that is different than the one you were born with is morally wrong.",
+      "quick_reply":"[Agree, Disagree, Undecided/Don't know]",
+      "redirection_section":"Positions",
+      "redirection_id": 12
+     },
+    "12": {
+      "text":"Transgender women (people who identify as women but were born men) should not be allowed to serve as public school teachers.",
+      "quick_reply":"[Agree, Disagree, Undecided/Don't know]",
+      "redirection_section":"Positions",
+      "redirection_id": 13
+     },
+    "13": {
+      "text":"It would be wrong to allow a transgender woman (a person who identifies as a woman but was born as a man) to use the woman's restroom.",
+      "quick_reply":"[Agree, Disagree, Undecided/Don't know]",
+      "redirection_section":"Positions",
+      "redirection_id": 14
+     },
+    "14": {
+      "text":"Men should dress like men and women should dress like women.",
+      "quick_reply":"[Agree, Disagree, Undecided/Don't know]",
+      "redirection_section":"Positions",
+      "redirection_id": 15
+     },
+    "15": {
+      "text":"Who you support in local and state elections can inform what type of rules and laws are made in Florida. Would you like to get more information from the Florida department of state on registering to vote, or confirming if you are already registered?",
+      "quick_reply":"[Yes, No]",
+      "redirection_section":"[Positions, EOS]",
+      "redirection_id": "[16, 1]"
+     },
+    "16": {
+      "text":"Here is a link to information from the Florida Department of State: https://registertovoteflorida.gov/home",
+      "quick_reply":"Continue",
+      "redirection_section":"EOS",
+      "redirection_id": 1
+     }
+   },
+  "EOS": {
+    "1": {
+      "text":"Thank you for participating in our study. We hope you found this conversation useful. We'd love to hear your thoughts you may have about your experience with this survey! Please share any questions or comments below.",
+      "redirection_section":"EOS",
+      "redirection_id": 2
+     },
+    "2": {
+      "text":"If you want to follow up with the study researchers, you can contact us at dataforsociety@uchicago.edu.",
+      "redirection_section":"EOS",
+    "redirection_id": 2
+     }
+   }
+ }
