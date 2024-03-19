@@ -1,18 +1,18 @@
-# Chabot-replication
-Replication files for "Canvassing with chatbots: personalized messaging using natural language processing to change attitudes"
+# Florida replication
+Repository for Replication files for "Canvassing with chatbots: personalized messaging using natural language processing to change attitudes".
 
-- Pre-registration [here](https://osf.io/yqmjg). 
+# Instructions for Replication
 
-**Files**
-+ `code/` folder
-  + Data cleaning script [`pre_processing_senderdb.R`](https://github.com/UChicago-pol-methods/DD-notes-memos/blob/main/chatbot-replication/code/pre_processing_senderdb.R)
-  + Analysis scripts [`main_analysis.R`](https://github.com/UChicago-pol-methods/DD-notes-memos/blob/main/chatbot-replication/code/main_analysis.R)
-  
-**Reproducing results**
 
-1. Save most recent data in the `data/` folder. 
-2. To replicate analysis, run
-   +  Data cleaning script [`pre_processing_senderdb.R`](https://github.com/UChicago-pol-methods/DD-notes-memos/blob/main/chatbot-replication/code/pre_processing_senderdb.R) then 
-   + Analysis scripts [`main_analysis.R`](https://github.com/UChicago-pol-methods/DD-notes-memos/blob/main/chatbot-replication/code/main_analysis.R)
-5. Resulting html files (`pre_processing_senderdb.html`, `main_analysis.html`) will be saved in the same folder.
-6. Figures and latex tables will be saved in `figures/` and `tables/` folders respectively.
+## Datasets and data cleaning
+Before starting the replication, ensure the the below files are contained in a `/data` folder in the parent directory.
+
+- `/data/df_for_analysis_final.rds`
+
+In the `/code` folder, compile `pre_processing_senderdb.R`, which will produce clean working data sets that are also located in `/data`:
+   - `/data/df_for_analysis_processed.rds`
+
+## Analysis
+Compile the following scripts in sequence:
+  - `/code/main_analysisr.R`, for tables and figures in the paper.
+  - `/code/estimations_w_bounds.R`, for tables and figures in the appendix. 
