@@ -9,8 +9,52 @@ library(kableExtra)
 library(boot)
 set.seed(60637)
 
-## read in data 
-df_analysis <- readRDS("~/Desktop/Uchicago/molly.nosync/DD-notes-memos/chatbot-replication/data/df_for_analysis_processed.rds")
+## read in data ----
+df_analysis <- readRDS("../data/df_for_analysis_processed.rds")
+
+### functions ----
+# Function to calculate weighted estimates
+compute_weighted_estimate <- function(data, outcome_var, covariate_formula) {
+  
+  data$attrited <- 0 #in the manski bounds setting, there's no missing value
+  data$treat_factor <- as.factor(ifelse(data$attrited == 0,
+                                        data$treat_ind,
+                                        2)+1)
+  
+  data_dummies <- dummy_cols(data, select_columns =
+                               c("healthcare_t0",
+                                 "abortion_t0"),
+                             remove_first_dummy = TRUE,
+                             remove_selected_columns = TRUE)
+  
+  forest_probs <- probability_forest(Y = data$treat_factor,
+                                     X = data_dummies[,grep('t0', names(data_dummies))])
+  
+  
+  balwts <- 1/forest_probs$predictions[cbind(1:nrow(data), as.numeric(data$treat_factor))]
+  
+  
+  # Filter based on `data` not `data_dummies` for the attrited and complete cases
+  lm_lin(reformulate('treat_ind', outcome_var), covariates = covariate_formula, weights = balwts, data = data)
+}
+
+# Define a function to fit models and extract estimates
+fit_models_and_extract_estimates <- function(outcome_var, attrition, data) {
+  # TODO add in covariate formula as explicit argument
+  
+  # mod1 <- lm_robust(reformulate('treat_ind', outcome_var), data = data)
+  # mod2 <- lm_lin(reformulate('treat_ind', outcome_var), covariates = covariate_formula, data = data)
+  
+  #data_processed <- process_data_for_attrition(data, sprintf("finished_dv_%s", attrition))
+  
+  mod3 <- compute_weighted_estimate(data, outcome_var, covariate_formula)
+  
+  c(
+    # coef(mod1)[["treat_indTRUE"]], coef(mod2)[["treat_indTRUE"]]
+    coef(mod3)[["treat_indTRUE"]]
+  )
+}
+
 
 all.dv.names.t1 <- c('florida_trans_policy_t1',
                      'florida_trans_policy2_t1',
@@ -149,47 +193,6 @@ bootstrap_estimate <- function(data, indices) {
   #   return(list(data_dummies = data_dummies, data = data))
   #   
   # }
-
-  # Function to calculate weighted estimates
-  compute_weighted_estimate <- function(data, outcome_var, covariate_formula) {
-
-    data$attrited <- 0 #in the manski bounds setting, there's no missing value
-    data$treat_factor <- as.factor(ifelse(data$attrited == 0,
-                                          data$treat_ind,
-                                          2)+1)
-    
-    data_dummies <- dummy_cols(data, select_columns =
-                                   c("healthcare_t0",
-                                     "abortion_t0"),
-                                 remove_first_dummy = TRUE,
-                                 remove_selected_columns = TRUE)
-
-    forest_probs <- probability_forest(Y = data$treat_factor,
-                                       X = data_dummies[,grep('t0', names(data_dummies))])
-    
-    
-    balwts <- 1/forest_probs$predictions[cbind(1:nrow(data), as.numeric(data$treat_factor))]
-    
-
-    # Filter based on `data` not `data_dummies` for the attrited and complete cases
-    lm_lin(reformulate('treat_ind', outcome_var), covariates = covariate_formula, weights = balwts, data = data)
-  }
-  
-  
-  # Define a function to fit models and extract estimates
-  fit_models_and_extract_estimates <- function(outcome_var, attrition, data) {
-    mod1 <- lm_robust(reformulate('treat_ind', outcome_var), data = data)
-    mod2 <- lm_lin(reformulate('treat_ind', outcome_var), covariates = covariate_formula, data = data)
-    
-    #data_processed <- process_data_for_attrition(data, sprintf("finished_dv_%s", attrition))
-
-    #mod3 <- compute_weighted_estimate(data, outcome_var, covariate_formula)
-
-    c(
-      coef(mod1)[["treat_indTRUE"]], coef(mod2)[["treat_indTRUE"]]
-      #coef(mod3)[["treat_indTRUE"]]
-      )
-  }
   
   # Apply the function for each outcome variable
   estimate_results_tlr <- fit_models_and_extract_estimates("tolerance_index","primary", sampled_data)
@@ -203,8 +206,10 @@ bootstrap_estimate <- function(data, indices) {
 
 # Bootstrapping (with reduced number of iterations for testing)
 
-boot_results_upper <- boot(dataset_list$df_upper_bound, bootstrap_estimate, R = 10000)
-boot_results_lower <- boot(dataset_list$df_lower_bound, bootstrap_estimate, R = 10000)
+boot_results_upper <- boot(dataset_list$df_upper_bound, bootstrap_estimate, R = 1e4)
+boot_results_lower <- boot(dataset_list$df_lower_bound, bootstrap_estimate, R = 1e4)
+
+# TODO save .rdata here
 
 # 95% CI for the Upper Bound Estimates
 # Initialize a list to store the CI results for each index

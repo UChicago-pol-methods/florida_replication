@@ -10,7 +10,7 @@ library(boot)
 set.seed(60637)
 
 ## read in data 
-df_analysis <- readRDS("~/Desktop/Uchicago/molly.nosync/DD-notes-memos/chatbot-replication/data/df_for_analysis_processed.rds")
+df_analysis <- readRDS("../data/df_for_analysis_processed.rds")
 
 all.dv.names.t1 <- c('florida_trans_policy_t1',
                      'florida_trans_policy2_t1',
