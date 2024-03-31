@@ -1,9 +1,3 @@
-## load in pacakges 
-library(data.table)
-library(dplyr)
-library(jsonlite)
-library(tidyr)
-library(xtable)
 
 ##--------------------------------------- description ---------------------------------------##
 ## this R code performs several data preprocessing tasks on sender_db, including concatenating user input data, 
@@ -11,7 +5,7 @@ library(xtable)
 ## and recoding variable names and values to improve clarity. 
 
 
-###---------------------------------------sender_db---------------------------------------------## 
+# --------------------------------------- Read Data ---------------------------------------
 ## read in data 
 df <- readRDS("../data/df_for_analysis_final.rds")
 
@@ -20,8 +14,7 @@ df$timestamp_utc <- as.POSIXct(df$timestamp_utc)
 df <- df %>%
   filter(timestamp_utc > "2023-04-19 16:55:00")
 
-
-## make sure each user only answer the survey once (filtered by the panel question)
+# ensure each user only answered the survey once, filtered by the panel question
 sender_id_fileter<-df %>%
   filter(section == "Panel1") %>%
   count(sender_id, section, section_id) %>%
@@ -41,7 +34,7 @@ df<-df %>%
   
 df<-rbind(df, sender_id_unique)
 
-## ---------------------------------------concatenation----------------------------------------## 
+# --------------------------------------- Data Concatenation ---------------------------------------
 ## concatenate open response 
 datalist <- list()
 for (i in list(c("Video", "4","5","1"),c("Video","6","7","2"),c("Define","4","5","3"),
@@ -59,14 +52,15 @@ big_data <- setDT(big_data)
 setDT(df)[big_data, sender_text:= i.sender_text,  on = .(sender_id, section,section_id)]
 
 
-##---------------------------------------pivot from long to wide--------------------------------------- ##
+# --------------------------------------- Pivot Long to Wide ---------------------------------------
+# Pivot the data frame from long format to wide format
 df_wide <- df %>%
   select(-c(chatbot_text_seq,chatbot_text,redirection_id,redirection_section, timestamp_utc)) %>%
   group_by(sender_id) %>%
   pivot_wider(names_from = c(section, section_id), values_from = sender_text)
 
-## ---------------------------------------re-order column--------------------------------------- ##
-## column name
+# --------------------------------------- Reorder Columns ---------------------------------------
+# Use column names from a JSON file for reordering
 column_name <- fromJSON("../supporting_data/linear_dict.json")
 results <- character()
 for (section in names(column_name)) {
@@ -77,11 +71,11 @@ for (section in names(column_name)) {
 results = c("sender_id", results)
 df_wide <- df_wide[,results]
 df_wide <- as.data.frame(df_wide)
-## replace null with NA
+# Replace 'NULL' and 'NA' with actual NA values
 df_wide[df_wide == "NULL"] <- NA
 df_wide[df_wide == "NA"] <- NA
 
-## --------------------------------------- re-code variable name ---------------------------------------##
+# --------------------------------------- Recode Variable Names ---------------------------------------
 ## re-code variable name - primary outcome
 old_primary_colname <- c("Positions_4", "Positions_8","Positions_9","Positions_10","Positions_11","Positions_12", "Positions_13","Positions_14")
 new_primary_colname <- c("therm_trans_t1","gender_norm_sexchange_t1" ,"gender_norm_moral_t1","gender_norm_abnormal_t1","gender_norm_trans_moral_wrong_t1","trans_teacher_t1",
@@ -108,7 +102,7 @@ names(df_wide) <- setNames(lapply(names(df_wide), function(x) {
 }), colnames(df_wide))
 
 
-## --------------------------------------- variable coding &  reverse coding ---------------------------------------##
+# --------------------------------------- Variable Coding & Reverse Coding ---------------------------------------
 ## reverse coding variables:
 ## 1. gender_norm_moral_t1 Coding: -1 = Agree, 0 = No opinion/don’t know, 1 = Disagree
 ## 2. gender_norm_abnormal_t1: Coding: -1 = Agree, 0 = No opinion/don’t know, 1 = Disagree
@@ -242,9 +236,8 @@ df_analysis[df_analysis=="NA"] <- NA
 df_analysis[df_analysis==""] <- NA
 
 
-##--------------------------------------- user input cleaning --------------------------------------- ##
-## extract as much useful information from input as possible
-# Function to extract the age number from the answer
+# --------------------------------------- User Input Cleaning ---------------------------------------
+# Clean user inputs, such as extracting age from a string
 extractAge <- function(answer) { 
   age <- gsub("\\D", "", answer)  # Remove non-digit characters
   age <- as.numeric(age)  # Convert the result to numeric
@@ -253,31 +246,9 @@ extractAge <- function(answer) {
 
 df_analysis$age_t0<- sapply(df_analysis$age_t0, extractAge)
 
-## convert from character to numeric
+# Convert character to numeric where applicable
 df_analysis[] <- lapply(df_analysis, function(x) if(is.list(x)) as.character(unlist(x)) else x)
 df_analysis[, -c(1,22,23)] <- apply(df_analysis[, -c(1,22,23)], 2, function(x) as.numeric(as.character(x)))
-
-
-# ## format control -  temporarily treating all answers which don't follow the coding rubric as NA
-# df_analysis$therm_trans_t1[!(df_analysis$therm_trans_t1 %in% c(0:10,999))] <- NA
-# df_analysis$gender_norm_sexchange_t1[!(df_analysis$gender_norm_sexchange_t1 %in% c(-1,0,1,999))] <- NA
-# df_analysis$gender_norm_moral_t1[!(df_analysis$gender_norm_moral_t1 %in% c(-1,0,1,999))] <- NA
-# df_analysis$gender_norm_abnormal_t1[!(df_analysis$gender_norm_abnormal_t1 %in% c(-1,0,1,999))] <- NA
-# df_analysis$gender_norm_trans_moral_wrong_t1[!(df_analysis$gender_norm_trans_moral_wrong_t1 %in% c(-1,0,1,999))] <- NA
-# df_analysis$trans_teacher_t1[!(df_analysis$trans_teacher_t1 %in% c(-1,0,1,999))] <- NA
-# df_analysis$trans_bathroom_t1[!(df_analysis$trans_bathroom_t1 %in% c(-1,0,1,999))] <- NA
-# df_analysis$gender_norm_dress_t1[!(df_analysis$gender_norm_dress_t1 %in% c(-1,0,1,999))] <- NA
-# df_analysis$florida_trans_policy_t1[!(df_analysis$florida_trans_policy_t1 %in% c(-3:3,999))] <- NA
-# df_analysis$florida_trans_policy2_t1[!(df_analysis$florida_trans_policy2_t1 %in% c(-3:3,999))] <- NA
-# df_analysis$gender_t0[!(df_analysis$gender_t0 %in% c(1,0,999))] <- NA
-# df_analysis$ideology_t0[!(df_analysis$ideology_t0 %in% c(-3:3,999))] <- NA
-# df_analysis$pid_t0[!(df_analysis$pid_t0 %in% c(-3:3,999))] <- NA
-# df_analysis$pol_interest_t0[!(df_analysis$pol_interest_t0 %in% c(-2:1,999))] <- NA
-# df_analysis$healthcare_t0[!(df_analysis$healthcare_t0 %in% c(1:3,999))] <- NA
-# df_analysis$climate_t0[!(df_analysis$climate_t0 %in% c(0:10,999))] <- NA
-# df_analysis$religion_t0[!(df_analysis$religion_t0 %in% c(-1,0,1,999))] <- NA
-# df_analysis$abortion_t0[!(df_analysis$abortion_t0 %in% c(1:4,999))] <- NA
-# df_analysis$immigration_t0[!(df_analysis$immigration_t0 %in% c(-1,0,1,999))] <- NA
 
 # Get the column names which end with 't0'
 varnames_t0 <- grep("t0$", names(df_analysis), value=TRUE)
@@ -297,7 +268,6 @@ df_analysis[c('healthcare_t0', 'abortion_t0')][df_analysis[c('healthcare_t0', 'a
 ### raplace 999 with NA for t1 variable
 varnames_t1 <- grep("t1$", names(df_analysis), value = TRUE)
 df_analysis[varnames_t1][df_analysis[varnames_t1] == 999] <- NA
-
 
 df_analysis$treat_ind <- NA
 df_analysis$treat_ind[!is.na(df_analysis$Context_1)] <- TRUE
@@ -329,7 +299,6 @@ df_analysis <- df_analysis %>%
     FALSE
   ))
 
-
 ## pre-survey finish rate
 n_complete_presurvey_rows <- sum(!is.na(df_analysis$treat_ind))
 pre_survey_finish_rate<-n_complete_presurvey_rows/nrow(df_wide)*100
@@ -346,7 +315,7 @@ df_analysis <- df_analysis %>%
   filter(therm_trans_t1 %in% c(0:10,999)| is.na(therm_trans_t1))
 
 
-##--------------------------------------- calculate survey finish rate---------------------------------------##
+# --------------------------------------- Survey Finish Rate and Filtering ---------------------------------------
 
 ## among people who finished the pre-survey question, calculate the randomization possibility
 n_control_group <- sum(df_analysis[, 24] != TRUE)
@@ -372,5 +341,5 @@ names(summary_table_latex)<-c("Group","N","Percentage", "Finish rate")
 # Save the summary table as a LaTeX file
 print(summary_table_latex, file = "../tables/attrition_summary.tex")
 
-## ---------------------------------- write-out ---------------------------------##
+# --------------------------------------- Final Data Write-out ---------------------------------------
 saveRDS(df_analysis, "../data/df_for_analysis_processed.rds")
