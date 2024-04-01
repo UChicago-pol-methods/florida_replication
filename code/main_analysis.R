@@ -162,12 +162,12 @@ therm_l <- list(mod1_therm,
                 mod3_therm)
 
 # Custom summary and formatting for model outputs
-custom_summary_tlr_l <- lapply(tlr_l, create_custom_summary)
-custom_summary_law_l <- lapply(law_l, create_custom_summary)
-custom_summary_therm_l <- lapply(therm_l, create_custom_summary)
+custom_summary_tlr <- lapply(tlr_l, create_custom_summary)
+custom_summary_law <- lapply(law_l, create_custom_summary)
+custom_summary_therm <- lapply(therm_l, create_custom_summary)
 
 # Apply the formatting function to each model summary
-object_names <- c("custom_summary_therm_l","custom_summary_tlr_l", "custom_summary_law_l")
+object_names <- c("custom_summary_therm","custom_summary_tlr", "custom_summary_law")
 for (name in object_names) {
   model_list <- get(name)
   formatted_list <- lapply(seq_along(model_list), function(i) {

@@ -1,4 +1,4 @@
-## load in pacakges 
+# --------------------------------------- Load Packages ---------------------------------------
 library(data.table)
 library(dplyr)
 library(jsonlite)
@@ -10,11 +10,13 @@ library(grf)
 library(modelsummary)
 library(tibble)
 library(kableExtra)
+library(boot)
 set.seed(60637)
 
-## read in data 
-df_analysis <- readRDS("./data/df_for_analysis_processed.rds")
+# --------------------------------------- Read Data ---------------------------------------
+df_analysis <- readRDS("../data/df_for_analysis_processed.rds")
 
+# --------------------------------------- Define Variables ---------------------------------------
 # post-treatment response measures
 all.dv.names.t1 <- c('florida_trans_policy_t1',
                      'florida_trans_policy2_t1',
@@ -28,10 +30,11 @@ all.dv.names.t1 <- c('florida_trans_policy_t1',
                      'gender_norm_dress_t1')
 trans.law.dvs.t1 <- c('florida_trans_policy_t1', 'florida_trans_policy2_t1')
 
-t0.covariate.names <- grep("t0$", names(df_analysis), value=TRUE)
+#t0.covariate.names <- grep("t0$", names(df_analysis), value=TRUE)
 t0.covariate.names <- t0.covariate.names[!t0.covariate.names %in% 
                                            c('healthcare_t0', 'abortion_t0')]
 
+## lin estimator covariates 
 lin_cov <- formula(
   paste('~', 
         paste(t0.covariate.names, collapse = ' + '),
@@ -59,6 +62,8 @@ compute.factor.dv <- function(dv.names,
 
 f1 <- function(x) format(round(x, 3), big.mark=",")
 
+
+## pre-processing data for dependent variables
 preprocess_data <- function(data) {
   data <- data %>%
     mutate(finished_dv_primary = ifelse(
@@ -89,8 +94,7 @@ preprocess_data <- function(data) {
 }
 
 
-### manski bounds data preparation #### 
-
+# --------------------------------------- Manski Bounds Data Preparation ---------------------------------------
 # Possible Lower Bound Calculation
 df_lower_bound <- df_analysis %>%
   mutate(
@@ -122,9 +126,7 @@ df_upper_bound <- df_analysis %>%
   )
 
 
-
-
-
+# ------------------------------- Results Compilation and Reporting Functions -------------------------------
 
 create_custom_summary <- function(model) {
   # Extract coefficients, standard errors, and p-values
@@ -140,7 +142,6 @@ create_custom_summary <- function(model) {
   coef_df$Nobs<-nobs_value
   return(coef_df)
 }
-
 
 
 # Helper function to get significance stars
