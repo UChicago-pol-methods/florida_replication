@@ -14,5 +14,6 @@ In the `/code` folder, compile `pre_processing_senderdb.R`, which will produce c
 
 ## Analysis
 Compile the following scripts in sequence:
+  - `/code/utils.R`, to load data preprocessing and helping functions.
   - `/code/main_analysis.R`, for tables and figures in the paper.
   - `/code/estimations_w_bounds.R`, `/code/bootstrapping_manski.R` for tables and figures in the appendix. 
