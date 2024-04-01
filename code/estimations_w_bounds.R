@@ -3,7 +3,6 @@ source('../code/utils.R')
 
 # ------------------------------- Data Preparation -------------------------------
 dataset_list <- list(
-  df_analysis = df_analysis,
   df_upper_bound = df_upper_bound, 
   df_lower_bound = df_lower_bound
 )
@@ -161,11 +160,11 @@ apply_estimations <- function(data, dataset_name) {
   models_therm <- list(mod1 = mod1_therm, mod2 = mod2_therm, mod3 = mod3_therm)
   
   # ------------------------------- Generate Custom Summaries -------------------------------
-  custom_summary_tlr_l <- lapply(models_tlr, create_custom_summary)
-  custom_summary_law_l <- lapply(models_law, create_custom_summary)
-  custom_summary_therm_l <- lapply(models_therm, create_custom_summary)
+  custom_summary_tlr <- lapply(models_tlr, create_custom_summary)
+  custom_summary_law <- lapply(models_law, create_custom_summary)
+  custom_summary_therm <- lapply(models_therm, create_custom_summary)
   
-  object_names <- c("custom_summary_therm_l","custom_summary_tlr_l", "custom_summary_law_l")
+  object_names <- c("custom_summary_therm","custom_summary_tlr", "custom_summary_law")
   
   for (name in object_names) {
     model_list <- get(name)

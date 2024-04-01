@@ -30,7 +30,7 @@ all.dv.names.t1 <- c('florida_trans_policy_t1',
                      'gender_norm_dress_t1')
 trans.law.dvs.t1 <- c('florida_trans_policy_t1', 'florida_trans_policy2_t1')
 
-#t0.covariate.names <- grep("t0$", names(df_analysis), value=TRUE)
+t0.covariate.names <- grep("t0$", names(df_analysis), value=TRUE)
 t0.covariate.names <- t0.covariate.names[!t0.covariate.names %in% 
                                            c('healthcare_t0', 'abortion_t0')]
 
