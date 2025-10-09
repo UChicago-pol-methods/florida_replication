@@ -146,9 +146,10 @@ create_custom_summary <- function(model) {
 
 # Helper function to get significance stars
 get_significance_stars <- function(sig) {
-  ifelse(sig == "***", "***", 
-         ifelse(sig == "**", "**", 
-                ifelse(sig == "*", "*", "")))
+  ifelse(sig == "***", "***",
+         ifelse(sig == "**", "**",
+                ifelse(sig == "*", "*",
+                       ifelse(sig == "+", "+", ""))))
 }
 
 
