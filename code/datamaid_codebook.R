@@ -1,8 +1,13 @@
 library(dataMaid)
+source('utils.R')  # Load helper functions to create indices
 
 ## read in data
 
 df_analysis<-readRDS("../data/df_for_analysis_processed.rds")
+
+# Create constructed indices (tolerance_index and laws_index)
+df_analysis <- preprocess_data(df_analysis)
+
 df_keep<-df_analysis
 
 
@@ -47,7 +52,23 @@ attr(df_keep$religion_t0,'shortDescription')<-"Pre-survey, religion. Would you s
 attr(df_keep$abortion_t0,'shortDescription')<-"Pre-survey, views on abortion. Under what circumstances should abortion be legal? Coding: Factors: 1 = Abortion shouldalways be legal. There should be no restrictions on abortion. 2 = Abortion shouldbe legal, but with some restrictions (such as for minors or late-term abortions). 3 = Abortion should only be legal in special circumstances, such as when the life of themother is in danger. 4 = Abortion should be illegal. It should never be allowed."
 attr(df_keep$immigration_t0,'shortDescription')<-"Pre-survey, views on immigration. Which comes closest to your view about illegal immigration? Coding: -1 = Illegal immigrants should be arrested and deported as quickly as possible regardless of their circumstances. 1 = Illegal immigrants now living in the U.S. should be allowed to become citizens if they pay a fine and meet other requirements"
 
+## Placebo/distractor policy questions (for robustness checks)
+attr(df_keep$tax_policy_t1, 'shortDescription') <- "Post-treatment placebo question: Raising federal taxes. Do you favor raising federal taxes on families earning more than $200,000 per year? Coding: -2 = Strongly Oppose, -1 = Somewhat Oppose, 0 = Not sure, 1 = Somewhat Favor, 2 = Strongly Favor. This question is unrelated to transgender policy and serves as a check for spillover effects."
+attr(df_keep$marijuana_policy_t1, 'shortDescription') <- "Post-treatment placebo question: Marijuana legalization. Marijuana should be legalized. Coding: -1 = Disagree, 0 = Undecided/Don't know, 1 = Agree. This question is unrelated to transgender policy and serves as a check for spillover effects."
+attr(df_keep$min_wage_policy_t1, 'shortDescription') <- "Post-treatment placebo question: Federal minimum wage. The federal minimum wage should be raised to $15 an hour. Coding: -1 = Disagree, 0 = Undecided/Don't know, 1 = Agree. This question is unrelated to transgender policy and serves as a check for spillover effects."
+attr(df_keep$voter_reg_interest_t1, 'shortDescription') <- "Post-treatment political engagement measure: Voter registration interest. Would you like to get more information from the Florida department of state on registering to vote? Coding: 0 = No, 1 = Yes. Measures political engagement following the intervention."
 
+## Treatment assignment
+attr(df_keep$treat_ind, 'shortDescription') <- "Treatment indicator. TRUE = transgender rights discussion (treatment condition), FALSE = boating safety discussion (control condition). Derived from whether Context_1 or Control_1 fields are populated."
+
+## Attrition tracking
+attr(df_keep$finished_dv_primary, 'shortDescription') <- "Attrition flag: whether respondent completed all questions needed to compute the tolerance index (8 attitude items). TRUE = completed all items, FALSE = missing one or more items."
+attr(df_keep$finished_dv_sec, 'shortDescription') <- "Attrition flag: whether respondent completed both Florida policy questions. TRUE = completed both law acceptance items, FALSE = missing one or both items."
+attr(df_keep$finished_dv_therm_trans, 'shortDescription') <- "Attrition flag: whether respondent completed the transgender feeling thermometer question. TRUE = completed thermometer rating, FALSE = missing."
+
+## Constructed indices (PRIMARY and SECONDARY OUTCOMES)
+attr(df_keep$tolerance_index, 'shortDescription') <- "PRIMARY OUTCOME: Transgender tolerance index. Factor analysis index constructed from 8 tolerance measures (gender_norm_sexchange_t1, gender_norm_moral_t1, gender_norm_abnormal_t1, gender_norm_trans_moral_wrong_t1, trans_teacher_t1, trans_bathroom_t1, gender_norm_dress_t1) using principal components analysis (princomp). Higher values indicate greater tolerance toward transgender individuals. Computed via compute.factor.dv() in utils.R."
+attr(df_keep$laws_index, 'shortDescription') <- "SECONDARY OUTCOME: Transgender policy acceptance index. Mean of florida_trans_policy_t1 and florida_trans_policy2_t1. Higher values indicate greater support for transgender-affirming policies in Florida. Range: -3 to 3."
 
 ## data transformation for better visualization 
 ## temporarily treating 999 as NA 

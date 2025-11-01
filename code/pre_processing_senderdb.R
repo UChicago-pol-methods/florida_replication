@@ -1,8 +1,14 @@
-
 ##--------------------------------------- description ---------------------------------------##
-## this R code performs several data preprocessing tasks on sender_db, including concatenating user input data, 
-## pivoting a long-format data frame into a wide-format data frame to better analyze the data, 
-## and recoding variable names and values to improve clarity. 
+## this R code performs several data preprocessing tasks on sender_db, including concatenating user input data,
+## pivoting a long-format data frame into a wide-format data frame to better analyze the data,
+## and recoding variable names and values to improve clarity.
+
+# Load required packages
+library(data.table)
+library(dplyr)
+library(jsonlite)
+library(tidyr)
+library(xtable) 
 
 
 # --------------------------------------- Read Data ---------------------------------------
@@ -83,6 +89,12 @@ new_primary_colname <- c("therm_trans_t1","gender_norm_sexchange_t1" ,"gender_no
 ## re-code variable name - secondary outcome
 old_secondary_colname <- c("Positions_1", "Positions_2")
 new_secondary_colname <- c("florida_trans_policy_t1", "florida_trans_policy2_t1")
+## re-code variable name - placebo/distractor policy questions
+old_placebo_colname <- c("Positions_3", "Positions_6", "Positions_7")
+new_placebo_colname <- c("tax_policy_t1", "marijuana_policy_t1", "min_wage_policy_t1")
+## re-code variable name - voter registration engagement
+old_engagement_colname <- c("Positions_15")
+new_engagement_colname <- c("voter_reg_interest_t1")
 ## re-code variable name -covariates
 old_covariates_colname <- c("Panel1_5", "Panel1_6","Panel1_2","Panel1_3","Panel1_4","Panel1_7","Panel1_8",
                           "Panel1_9","Panel1_10","Panel1_11")
@@ -100,20 +112,34 @@ names(df_wide) <- setNames(lapply(names(df_wide), function(x) {
 names(df_wide) <- setNames(lapply(names(df_wide), function(x) {
   ifelse(x %in% old_covariates_colname, new_covariates_colname[old_covariates_colname == x], x)
 }), colnames(df_wide))
+## change placebo column name
+names(df_wide) <- setNames(lapply(names(df_wide), function(x) {
+  ifelse(x %in% old_placebo_colname, new_placebo_colname[old_placebo_colname == x], x)
+}), colnames(df_wide))
+## change engagement column name
+names(df_wide) <- setNames(lapply(names(df_wide), function(x) {
+  ifelse(x %in% old_engagement_colname, new_engagement_colname[old_engagement_colname == x], x)
+}), colnames(df_wide))
 
 
 # --------------------------------------- Variable Coding & Reverse Coding ---------------------------------------
 ## reverse coding variables:
-## 1. gender_norm_moral_t1 Coding: -1 = Agree, 0 = No opinion/don’t know, 1 = Disagree
-## 2. gender_norm_abnormal_t1: Coding: -1 = Agree, 0 = No opinion/don’t know, 1 = Disagree
-## 3. gender_norm_trans_moral_wrong_t1: Coding:  -1 = Agree, 0 = Noopinion/don’t know, 1 = Disagree
-## 4. trans_teacher_t1: Coding: -1 = Agree, 0 = No opinion/don’t know, 1 = Disagree
-## 5. trans_bathroom_t1: Coding: -1 = Agree, 0 = No opinion/don’t know, 1 = Disagree
-## 6. gender_norm_dress_t1: [Coding: -1 = Agree, 0 = No opinion/don’t know, 1 = Disagree
+## 1. gender_norm_moral_t1 Coding: -1 = Agree, 0 = No opinion/don't know, 1 = Disagree
+## 2. gender_norm_abnormal_t1: Coding: -1 = Agree, 0 = No opinion/don't know, 1 = Disagree
+## 3. gender_norm_trans_moral_wrong_t1: Coding:  -1 = Agree, 0 = Noopinion/don't know, 1 = Disagree
+## 4. trans_teacher_t1: Coding: -1 = Agree, 0 = No opinion/don't know, 1 = Disagree
+## 5. trans_bathroom_t1: Coding: -1 = Agree, 0 = No opinion/don't know, 1 = Disagree
+## 6. gender_norm_dress_t1: [Coding: -1 = Agree, 0 = No opinion/don't know, 1 = Disagree
 df_analysis <- df_wide %>%
   select(sender_id, therm_trans_t1,gender_norm_sexchange_t1,gender_norm_moral_t1,gender_norm_abnormal_t1,gender_norm_trans_moral_wrong_t1,
          trans_teacher_t1,trans_bathroom_t1,gender_norm_dress_t1,florida_trans_policy_t1,florida_trans_policy2_t1,age_t0,gender_t0,ideology_t0,pid_t0,pol_interest_t0,
          healthcare_t0,climate_t0,religion_t0,abortion_t0,immigration_t0,Control_1,Context_1 )
+
+# Add placebo variables separately (these are list-columns in df_wide)
+df_analysis$tax_policy_t1 <- df_wide$tax_policy_t1
+df_analysis$marijuana_policy_t1 <- df_wide$marijuana_policy_t1
+df_analysis$min_wage_policy_t1 <- df_wide$min_wage_policy_t1
+df_analysis$voter_reg_interest_t1 <- df_wide$voter_reg_interest_t1
 ## gender_norm_sexchange_t1
 df_analysis$gender_norm_sexchange_t1 <- case_when(df_analysis$gender_norm_sexchange_t1 == "agree" ~ -1,
                                                   df_analysis$gender_norm_sexchange_t1 == "disagree" ~ 1,
@@ -228,6 +254,33 @@ df_analysis$immigration_t0 <- case_when(df_analysis$immigration_t0 == "1" ~ -1,
                                         df_analysis$immigration_t0 == "NA" ~ NA_integer_,
                                         TRUE ~ 999)
 
+## Placebo/distractor policy questions (for robustness checks)
+# tax_policy_t1: 1=Strongly Favor (+2), 2=Somewhat Favor (+1), 3=Somewhat Oppose (-1), 4=Strongly Oppose (-2), 5=Not sure (0)
+df_analysis$tax_policy_t1 <- case_when(df_analysis$tax_policy_t1 == "1" ~ 2,
+                                       df_analysis$tax_policy_t1 == "2" ~ 1,
+                                       df_analysis$tax_policy_t1 == "3" ~ -1,
+                                       df_analysis$tax_policy_t1 == "4" ~ -2,
+                                       df_analysis$tax_policy_t1 == "5" ~ 0,
+                                       df_analysis$tax_policy_t1 == "NA" ~ NA_integer_,
+                                       TRUE ~ 999)
+# marijuana_policy_t1: Agree (+1), Disagree (-1), Undecided (0)
+df_analysis$marijuana_policy_t1 <- case_when(df_analysis$marijuana_policy_t1 == "agree" ~ 1,
+                                             df_analysis$marijuana_policy_t1 == "disagree" ~ -1,
+                                             df_analysis$marijuana_policy_t1 == "undecided/don't know" ~ 0,
+                                             df_analysis$marijuana_policy_t1 == "NA" ~ NA_integer_,
+                                             TRUE ~ 999)
+# min_wage_policy_t1: Agree (+1), Disagree (-1), Undecided (0)
+df_analysis$min_wage_policy_t1 <- case_when(df_analysis$min_wage_policy_t1 == "agree" ~ 1,
+                                            df_analysis$min_wage_policy_t1 == "disagree" ~ -1,
+                                            df_analysis$min_wage_policy_t1 == "undecided/don't know" ~ 0,
+                                            df_analysis$min_wage_policy_t1 == "NA" ~ NA_integer_,
+                                            TRUE ~ 999)
+# voter_reg_interest_t1: Yes (+1), No (0) - binary engagement measure
+df_analysis$voter_reg_interest_t1 <- case_when(df_analysis$voter_reg_interest_t1 == "yes" ~ 1,
+                                               df_analysis$voter_reg_interest_t1 == "no" ~ 0,
+                                               df_analysis$voter_reg_interest_t1 == "NA" ~ NA_integer_,
+                                               TRUE ~ 999)
+
 ### NA: user didn't answer; 999: user answered something else other than the provided answer
 ## fill NA or blankness with NA
 
@@ -293,7 +346,7 @@ df_analysis <- df_analysis %>%
   ))
 
 df_analysis <- df_analysis %>%
-  mutate(finished_dv_therm_thrans = ifelse(
+  mutate(finished_dv_therm_trans = ifelse(
     !is.na(df_analysis$therm_trans_t1) & df_analysis$therm_trans_t1 != 999,
     TRUE,
     FALSE
@@ -318,14 +371,14 @@ df_analysis <- df_analysis %>%
 # --------------------------------------- Survey Finish Rate and Filtering ---------------------------------------
 
 ## among people who finished the pre-survey question, calculate the randomization possibility
-n_control_group <- sum(df_analysis[, 24] != TRUE)
-n_treatment_group <- sum(df_analysis[, 24] == TRUE)
+n_control_group <- sum(df_analysis[, "treat_ind"] != TRUE)
+n_treatment_group <- sum(df_analysis[, "treat_ind"] == TRUE)
 percent_control<-n_control_group/(n_treatment_group+n_control_group)*100
 percent_treatment<-n_treatment_group/(n_treatment_group+n_control_group)*100
 ## finish rate for each group
-n_complete_control_rows <- sum((df_analysis[, 24] != TRUE) & (df_analysis[, 25] == TRUE & df_analysis[, 26] == TRUE))
+n_complete_control_rows <- sum((df_analysis[, "treat_ind"] != TRUE) & (df_analysis[, "finished_dv_primary"] == TRUE & df_analysis[, "finished_dv_sec"] == TRUE))
 finish_rate_control<-n_complete_control_rows/n_control_group*100
-n_complete_treatment_rows <-  sum((df_analysis[, 24] == TRUE) & (df_analysis[, 25] == TRUE & df_analysis[, 26] == TRUE))
+n_complete_treatment_rows <-  sum((df_analysis[, "treat_ind"] == TRUE) & (df_analysis[, "finished_dv_primary"] == TRUE & df_analysis[, "finished_dv_sec"] == TRUE))
 finish_rate_treatment<-n_complete_treatment_rows/n_treatment_group*100
 
 summary_table <- data.frame(
