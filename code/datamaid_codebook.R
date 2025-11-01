@@ -14,7 +14,7 @@ df_keep<-df_analysis
 ## Primary outcome:  general trans tolerance attitudes
 attr(df_keep$sender_id, 'shortDescription') <- "Unique identifier."
 attr(df_keep$therm_trans_t1, 'shortDescription') <- "How do you feel towards transgender people? The higher the number, the warmer or more favorable you feel toward that person, the lower the number, the colder or less favorable you feel. You can pick any number between 0 and 10.
-Coded from 1-10."
+Coded from 0-10."
 attr(df_keep$gender_norm_sexchange_t1, 'shortDescription') <- "I would support a friend choosing to have a sex change; 
 Coded as: -1 = Disagree, 0 = No opinion/don’t know, 1 = Agree."
 attr(df_keep$gender_norm_moral_t1,  'shortDescription')<-"It is morally wrong for a man to present himself as awoman in public; 

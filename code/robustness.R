@@ -280,7 +280,7 @@ for (outcome in placebo_outcomes) {
 
 # Generate LaTeX table for placebo outcomes
 sink("../tables/placebo_outcomes.tex")
-cat("\\begin{tabular}{lccc}\n")
+cat("\\begin{tabular}{lcccc}\n")
 cat("\\toprule\n")
 cat("Outcome & Model & Estimate & SE & P-value \\\\\n")
 cat("\\midrule\n")
