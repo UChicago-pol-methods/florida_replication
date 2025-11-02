@@ -34,11 +34,9 @@ t0.covariate.names <- grep("t0$", names(df_analysis), value=TRUE)
 t0.covariate.names <- t0.covariate.names[!t0.covariate.names %in%
                                            c('healthcare_t0', 'abortion_t0')]
 
-<<<<<<< HEAD
+
 # Lin estimator covariates formula
-=======
 ## lin estimator covariates
->>>>>>> update utils; add placebo test code and table
 lin_cov <- formula(
   paste('~',
         paste(t0.covariate.names, collapse = ' + '),
@@ -228,11 +226,9 @@ preprocess_data <- function(data) {
       FALSE
     ))
 
-<<<<<<< HEAD
+
   # Tolerance scale
-=======
   #### tolerance scale
->>>>>>> update utils; add placebo test code and table
   data$tolerance_index[data$finished_dv_primary] <- compute.factor.dv(
     all.dv.names.t1[-c(1,2)],
     data,
@@ -278,11 +274,10 @@ df_upper_bound <- df_analysis %>%
 
 # ------------------------------- Balance Table Function -------------------------------
 
-<<<<<<< HEAD
 create_balance_table <- function(data, filename) {
   # Get list of all t0 covariates
   all_covariates <- c(t0.covariate.names, 'healthcare_t0', 'abortion_t0')
-  
+
   # Calculate balance statistics by treatment
   balance_stats <- data %>%
     group_by(treat_ind) %>%
@@ -290,14 +285,14 @@ create_balance_table <- function(data, filename) {
                      list(mean = ~mean(.x, na.rm = TRUE),
                           se = ~sd(.x, na.rm = TRUE) / sqrt(sum(!is.na(.x)))),
                      .names = "{.col}_{.fn}"))
-  
+
   # Extract control and treatment stats
   control_stats <- balance_stats %>% filter(treat_ind == FALSE)
   treatment_stats <- balance_stats %>% filter(treat_ind == TRUE)
-  
+
   # Create mean and SE rows for the table
   balance_table <- data.frame(Covariate = character(), stringsAsFactors = FALSE)
-  
+
   for (var in all_covariates) {
     # Get variable label
     var_label <- recode(var,
@@ -311,20 +306,20 @@ create_balance_table <- function(data, filename) {
                         "religion_t0" = "Religiosity",
                         "abortion_t0" = "Abortion Importance",
                         "immigration_t0" = "Immigration Attitudes")
-    
+
     # Get means and SEs
     control_mean <- control_stats[[paste0(var, "_mean")]]
     control_se <- control_stats[[paste0(var, "_se")]]
     treatment_mean <- treatment_stats[[paste0(var, "_mean")]]
     treatment_se <- treatment_stats[[paste0(var, "_se")]]
-    
+
     # Calculate difference
     diff <- treatment_mean - control_mean
-    
+
     # Run t-test for statistical significance
     control_vals <- data[[var]][data$treat_ind == FALSE]
     treatment_vals <- data[[var]][data$treat_ind == TRUE]
-    
+
     if (var %in% c('healthcare_t0', 'abortion_t0')) {
       # For categorical variables, use chi-square test
       tbl <- table(data$treat_ind, data[[var]])
@@ -343,39 +338,39 @@ create_balance_table <- function(data, filename) {
       # SE of difference from t-test
       diff_se <- test_result$stderr
     }
-    
+
     # Get significance stars
     sig_stars <- ifelse(p_val < 0.001, "***",
                         ifelse(p_val < 0.01, "**",
                                ifelse(p_val < 0.05, "*",
                                       ifelse(p_val < 0.1, "+", ""))))
-    
+
     # Create mean row
     row_mean <- c(var_label,
                   sprintf("%.3f", control_mean),
                   sprintf("%.3f", treatment_mean),
                   paste0(sprintf("%.3f", diff), sig_stars),
                   sprintf("%.3f", p_val))
-    
+
     # Create SE row
     row_se <- c("",
                 sprintf("(%.3f)", control_se),
                 sprintf("(%.3f)", treatment_se),
                 sprintf("(%.3f)", diff_se),
                 "")
-    
+
     balance_table <- rbind(balance_table, row_mean, row_se)
-  }
-  
+}
+
   # Add N row
   n_control <- sum(data$treat_ind == FALSE)
   n_treatment <- sum(data$treat_ind == TRUE)
   n_row <- c("N", sprintf("%.0f", n_control), sprintf("%.0f", n_treatment), "", "")
   balance_table <- rbind(balance_table, n_row)
-  
+
   # Set column names
   colnames(balance_table) <- c("Covariate", "Control", "Treatment", "Difference", "P_value")
-  
+
   # Create LaTeX table (just the tabular)
   latex_balance_table <- balance_table %>%
     kable(format = "latex", booktabs = TRUE, escape = FALSE,
@@ -383,13 +378,13 @@ create_balance_table <- function(data, filename) {
           linesep = "",
           col.names = c("Covariate", "Control", "Treatment", "Difference", "P-value")) %>%
     add_header_above(c(" " = 1, "Mean" = 2, " " = 1, " " = 1))
-  
+
   # Save LaTeX table
   writeLines(latex_balance_table, filename)
-  
+
   # Print the LaTeX table
   print(latex_balance_table)
-=======
+}
 # ------------------------------- Results Compilation and Reporting Functions -------------------------------
 
 create_custom_summary <- function(model) {
@@ -450,5 +445,5 @@ format_for_table <- function(model_summary, model_number) {
 
   # Combine the term data with Nobs
   bind_rows(term_data, nobs_row)
->>>>>>> update utils; add placebo test code and table
-}
+
+  }
