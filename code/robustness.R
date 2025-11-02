@@ -50,22 +50,21 @@ make_balancing_weights <- function(data, module = "primary",
   module <- normalize_module(module)
   dat <- data
 
-  # Module-specific completion flag (fix typo to *_therm_trans)
+  # Module-specific completion flag
   attr_flag <- switch(module,
-                      "primary"   = "finished_dv_primary",
+                      "primary" = "finished_dv_primary",
                       "secondary" = "finished_dv_sec",
-                      "therm"     = "finished_dv_therm_trans")
+                      "therm" = "finished_dv_therm_trans")
 
-  # Mark attrition; treat NA as attrited
+  # Mark attrition
   dat$attrited <- ifelse(!is.na(dat[[attr_flag]]) & dat[[attr_flag]] == TRUE, 0L, 1L)
 
   # 3-class label: 1=control complete, 2=treated complete, 3=attrited (any arm)
-  # Works whether treat_ind is logical or 0/1 numeric.
   is_treated <- as.logical(dat$treat_ind)
   tf_base <- ifelse(dat$attrited == 0L, ifelse(is_treated, 1L, 0L), 2L)
   dat$treat_factor <- factor(tf_base + 1L, levels = c(1L, 2L, 3L))
 
-  # Build dummies for categorical baseline vars (keep originals; handle older fastDummies)
+  # Build dummies for categorical baseline vars
   has_ignore_na <- "ignore_na" %in% names(formals(fastDummies::dummy_cols))
   if (has_ignore_na) {
     dat_dum <- fastDummies::dummy_cols(
@@ -90,7 +89,7 @@ make_balancing_weights <- function(data, module = "primary",
                        "immigration_t0")
   categorical_covs <- c("healthcare_t0", "abortion_t0")
 
-  # Exclude the held-out variable (if categorical, drop all its dummies)
+  # Exclude the held-out variable
   cont_keep <- setdiff(continuous_covs, drop_var)
   cat_keep  <- setdiff(categorical_covs, drop_var)
 
@@ -131,7 +130,7 @@ make_balancing_weights <- function(data, module = "primary",
 
   list(
     weights = balwts[keep_analysis],
-    data    = dat[keep_analysis, , drop = FALSE]
+    data = dat[keep_analysis, , drop = FALSE]
   )
 }
 
@@ -144,7 +143,7 @@ test_leave_one_out_module <- function(left_out_var, module_name, seed = SEED) {
   # Restrict to non-missing outcome var and treatment indicator
   nonmiss <- !is.na(wdat$data[[left_out_var]]) & !is.na(wdat$data$treat_ind)
   dat_use <- wdat$data[nonmiss, , drop = FALSE]
-  w_use   <- wdat$weights[nonmiss]
+  w_use <- wdat$weights[nonmiss]
 
   if (nrow(dat_use) == 0) {
     return(data.frame(Module = module_name, Variable = left_out_var,
@@ -157,12 +156,12 @@ test_leave_one_out_module <- function(left_out_var, module_name, seed = SEED) {
   mod <- estimatr::lm_robust(f, data = dat_use, weights = w_use)
 
   coef_names <- names(coef(mod))
-  coef_name  <- if ("treat_indTRUE" %in% coef_names) "treat_indTRUE" else "treat_ind"
+  coef_name <- if ("treat_indTRUE" %in% coef_names) "treat_indTRUE" else "treat_ind"
 
   est <- unname(coef(mod)[coef_name])
-  se  <- mod$std.error[coef_name]
-  p   <- mod$p.value[coef_name]
-  n   <- stats::nobs(mod)
+  se <- mod$std.error[coef_name]
+  p <- mod$p.value[coef_name]
+  n <- stats::nobs(mod)
 
   sig <- if (is.na(p)) "" else if (p < 0.001) "***" else if (p < 0.01) "**" else if (p < 0.05) "*" else if (p < 0.10) "+" else ""
 
@@ -179,7 +178,7 @@ test_leave_one_out_module <- function(left_out_var, module_name, seed = SEED) {
   # Restrict to non-missing outcome var and treatment indicator
   nonmiss <- !is.na(wdat$data[[left_out_var]]) & !is.na(wdat$data$treat_ind)
   dat_use <- wdat$data[nonmiss, , drop = FALSE]
-  w_use   <- wdat$weights[nonmiss]
+  w_use <- wdat$weights[nonmiss]
 
   if (nrow(dat_use) == 0) {
     return(data.frame(Module = module_name, Variable = left_out_var,
@@ -192,12 +191,12 @@ test_leave_one_out_module <- function(left_out_var, module_name, seed = SEED) {
   mod <- estimatr::lm_robust(f, data = dat_use, weights = w_use)
 
   coef_names <- names(coef(mod))
-  coef_name  <- if ("treat_indTRUE" %in% coef_names) "treat_indTRUE" else "treat_ind"
+  coef_name <- if ("treat_indTRUE" %in% coef_names) "treat_indTRUE" else "treat_ind"
 
   est <- unname(coef(mod)[coef_name])
-  se  <- mod$std.error[coef_name]
-  p   <- mod$p.value[coef_name]
-  n   <- stats::nobs(mod)
+  se <- mod$std.error[coef_name]
+  p <- mod$p.value[coef_name]
+  n <- stats::nobs(mod)
 
   sig <- if (is.na(p)) "" else if (p < 0.001) "***" else if (p < 0.01) "**" else if (p < 0.05) "*" else if (p < 0.10) "+" else ""
 
@@ -209,9 +208,9 @@ test_leave_one_out_module <- function(left_out_var, module_name, seed = SEED) {
 # Run tests across modules and covariates
 # ------------------------------------------------------------------------------------------
 modules <- list(
-  primary   = df_analysis %>% dplyr::filter(finished_dv_primary == TRUE),
+  primary = df_analysis %>% dplyr::filter(finished_dv_primary == TRUE),
   secondary = df_analysis %>% dplyr::filter(finished_dv_sec == TRUE),
-  therm     = df_analysis %>% dplyr::filter(finished_dv_therm_trans == TRUE)
+  therm = df_analysis %>% dplyr::filter(finished_dv_therm_trans == TRUE)
 )
 
 loo_results_all <- data.frame()
