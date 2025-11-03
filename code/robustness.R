@@ -1,18 +1,18 @@
 
 # Load data, packages and functions
-source('../code/utils.R')
+source('./code/utils.R')
 
 # ------------------------------- Generate Balance Tables ------------------------
 
 # Table 1: All respondents
 cat("\n=== Balance Table: All Respondents ===\n")
-create_balance_table(df_analysis, "../tables/balance_table_all.tex")
+create_balance_table(df_analysis, "./tables/balance_table_all.tex")
 
 # Table 2: Completers only
 cat("\n=== Balance Table: Completers Only ===\n")
 df_completers <- df_analysis %>%
   filter(finished_dv_primary == TRUE & finished_dv_sec == TRUE)
-create_balance_table(df_completers, "../tables/balance_table_completers.tex")
+create_balance_table(df_completers, "./tables/balance_table_completers.tex")
 
 
 # ------------------------------- Placebo Analysis -------------------------------
@@ -26,131 +26,220 @@ cat("\n=== Placebo Test 1: Leave-One-Out Covariate Test ===\n")
 cat("Weighted treated-control differences in pre-treatment covariates (held-out from GRF)\n")
 cat("Testing separately for each outcome module\n\n")
 
-# All baseline covariates to test
+# All baseline covariates to test (matches professor's list/order)
+
+SEED <- 60637
+set.seed(SEED)
+
 all_covariates <- c("age_t0", "gender_t0", "ideology_t0", "pid_t0",
                     "pol_interest_t0", "climate_t0", "religion_t0",
                     "immigration_t0", "healthcare_t0", "abortion_t0")
 
-# Function to test leave-one-out for a specific outcome module
-test_leave_one_out_module <- function(left_out_var, data, module_name) {
+normalize_module <- function(module) {
+  allowed <- c("primary", "secondary", "therm")
+  m <- as.character(module)[1]
+  if (is.na(m) || !(m %in% allowed)) {
+    stop(sprintf("`module` must be one of %s; got: %s", paste(allowed, collapse = ", "), deparse(module)))
+  }
+  m
+}
 
-  # Get list of all continuous covariates (exclude the left-out one)
+
+make_balancing_weights <- function(data, module = "primary",
+                                   drop_var = NULL, seed = SEED) {
+  module <- normalize_module(module)
+  dat <- data
+
+  # Module-specific completion flag
+  attr_flag <- switch(module,
+                      "primary" = "finished_dv_primary",
+                      "secondary" = "finished_dv_sec",
+                      "therm" = "finished_dv_therm_trans")
+
+  # Mark attrition
+  dat$attrited <- ifelse(!is.na(dat[[attr_flag]]) & dat[[attr_flag]] == TRUE, 0L, 1L)
+
+  # 3-class label: 1=control complete, 2=treated complete, 3=attrited (any arm)
+  is_treated <- as.logical(dat$treat_ind)
+  tf_base <- ifelse(dat$attrited == 0L, ifelse(is_treated, 1L, 0L), 2L)
+  dat$treat_factor <- factor(tf_base + 1L, levels = c(1L, 2L, 3L))
+
+  # Build dummies for categorical baseline vars
+  has_ignore_na <- "ignore_na" %in% names(formals(fastDummies::dummy_cols))
+  if (has_ignore_na) {
+    dat_dum <- fastDummies::dummy_cols(
+      dat,
+      select_columns = c("healthcare_t0", "abortion_t0"),
+      remove_first_dummy = TRUE,
+      remove_selected_columns = FALSE,
+      ignore_na = TRUE
+    )
+  } else {
+    dat_dum <- fastDummies::dummy_cols(
+      dat,
+      select_columns = c("healthcare_t0", "abortion_t0"),
+      remove_first_dummy = TRUE,
+      remove_selected_columns = FALSE
+    )
+  }
+
+  # Continuous vs. categorical covariates
   continuous_covs <- c("age_t0", "gender_t0", "ideology_t0", "pid_t0",
                        "pol_interest_t0", "climate_t0", "religion_t0",
                        "immigration_t0")
-  continuous_remaining <- setdiff(continuous_covs, left_out_var)
-
-  # Get list of categorical covariates (exclude the left-out one if applicable)
   categorical_covs <- c("healthcare_t0", "abortion_t0")
-  categorical_remaining <- setdiff(categorical_covs, left_out_var)
 
-  # Prepare data with dummies for probability forest
-  # Use ignore_na = TRUE to handle missing categorical values
-  if (length(categorical_remaining) > 0) {
-    data_dummies <- dummy_cols(data,
-                               select_columns = categorical_remaining,
-                               remove_first_dummy = TRUE,
-                               remove_selected_columns = FALSE,
-                               ignore_na = TRUE)
+  # Exclude the held-out variable
+  cont_keep <- setdiff(continuous_covs, drop_var)
+  cat_keep  <- setdiff(categorical_covs, drop_var)
+
+  # All dummies for remaining categorical covariates
+  if (length(cat_keep) > 0) {
+    pat <- paste0("^(", paste(cat_keep, collapse = "|"), ")_")
+    cat_dummies <- names(dat_dum)[grepl(pat, names(dat_dum))]
   } else {
-    data_dummies <- data
+    cat_dummies <- character(0)
+  }
+  x_cols <- c(cont_keep, cat_dummies)
+  if (length(x_cols) == 0) stop("No features left for GRF after exclusions.")
+
+  # Rows available for forest: non-missing class label and continuous covariates observed
+  keep_forest <- !is.na(dat$treat_factor)
+  if (length(cont_keep) > 0) {
+    # require complete cases on continuous-only covariates (dummies allow NA via ignore_na)
+    keep_forest <- keep_forest & apply(dat_dum[, cont_keep, drop = FALSE], 1, function(r) all(!is.na(r)))
   }
 
-  # Filter to only rows where left-out variable and treatment are non-missing
-  data_analysis <- data_dummies %>%
-    filter(!is.na(.data[[left_out_var]]) & !is.na(treat_ind))
+  # Fit probability forest and get in-sample class probabilities
+  set.seed(seed)
+  pf <- grf::probability_forest(
+    Y = dat$treat_factor[keep_forest],
+    X = as.matrix(dat_dum[keep_forest, x_cols, drop = FALSE])
+  )
+  pred <- predict(pf)$predictions  # robust across GRF versions
 
-  # Get all t0 variables for forest (excluding left-out)
-  if (left_out_var %in% categorical_covs) {
-    # If left-out is categorical, exclude all its dummies
-    t0_vars_forest <- c(continuous_remaining,
-                       names(data_analysis)[grepl(paste0("^(",
-                                                        paste(categorical_remaining, collapse="|"),
-                                                        ")_"), names(data_analysis))])
-  } else {
-    # If left-out is continuous, just exclude it
-    t0_vars_forest <- c(continuous_remaining,
-                       names(data_analysis)[grepl(paste0("^(",
-                                                        paste(categorical_covs, collapse="|"),
-                                                        ")_"), names(data_analysis))])
-  }
+  # Inverse probability weights for realized class
+  realized_class <- as.integer(dat$treat_factor[keep_forest])
+  w_sub <- 1 / pred[cbind(seq_len(nrow(pred)), realized_class)]
 
-  # Calculate propensity scores using GRF (excluding left-out variable)
-  forest_probs <- probability_forest(Y = as.factor(data_analysis$treat_ind),
-                                     X = data_analysis[, t0_vars_forest])
+  balwts <- rep(NA_real_, nrow(dat))
+  balwts[keep_forest] <- w_sub
 
-  balwts <- 1 / forest_probs$predictions[cbind(1:nrow(data_analysis),
-                                               as.numeric(as.factor(data_analysis$treat_ind)))]
+  # Keep completed cases for this module (analysis sample)
+  keep_analysis <- keep_forest & dat$attrited == 0L
 
-  # Test for "effect" on left-out variable using simple weighted regression
-  # (not Lin-adjusted - cleaner test of whether reweighting balanced this variable)
-  mod_placebo <- lm_robust(reformulate('treat_ind', left_out_var),
-                          weights = balwts,
-                          data = data_analysis)
-
-  # Extract results
-  coef_est <- coef(mod_placebo)["treat_indTRUE"]
-  se <- mod_placebo$std.error["treat_indTRUE"]
-  pval <- mod_placebo$p.value["treat_indTRUE"]
-
-  # Add significance stars
-  sig_stars <- ifelse(pval < 0.001, "***",
-                     ifelse(pval < 0.01, "**",
-                            ifelse(pval < 0.05, "*",
-                                   ifelse(pval < 0.10, "+", ""))))
-
-  return(data.frame(
-    Module = module_name,
-    Variable = left_out_var,
-    Estimate = coef_est,
-    SE = se,
-    P_value = pval,
-    Sig = sig_stars,
-    N = nrow(data_analysis)
-  ))
+  list(
+    weights = balwts[keep_analysis],
+    data = dat[keep_analysis, , drop = FALSE]
+  )
 }
 
-# Define outcome modules and their completion filters
+# ------------------------------------------------------------------------------------------
+# One leave-one-out test
+# ------------------------------------------------------------------------------------------
+test_leave_one_out_module <- function(left_out_var, module_name, seed = SEED) {
+  wdat <- make_balancing_weights(df_analysis, module = module_name, drop_var = left_out_var, seed = seed)
+
+  # Restrict to non-missing outcome var and treatment indicator
+  nonmiss <- !is.na(wdat$data[[left_out_var]]) & !is.na(wdat$data$treat_ind)
+  dat_use <- wdat$data[nonmiss, , drop = FALSE]
+  w_use <- wdat$weights[nonmiss]
+
+  if (nrow(dat_use) == 0) {
+    return(data.frame(Module = module_name, Variable = left_out_var,
+                      Estimate = NA_real_, SE = NA_real_, P_value = NA_real_,
+                      Sig = "", N = 0L))
+  }
+
+  # Weighted regression (no Lin adjustment)
+  f <- reformulate("treat_ind", left_out_var)
+  mod <- estimatr::lm_robust(f, data = dat_use, weights = w_use)
+
+  coef_names <- names(coef(mod))
+  coef_name <- if ("treat_indTRUE" %in% coef_names) "treat_indTRUE" else "treat_ind"
+
+  est <- unname(coef(mod)[coef_name])
+  se <- mod$std.error[coef_name]
+  p <- mod$p.value[coef_name]
+  n <- stats::nobs(mod)
+
+  sig <- if (is.na(p)) "" else if (p < 0.001) "***" else if (p < 0.01) "**" else if (p < 0.05) "*" else if (p < 0.10) "+" else ""
+
+  data.frame(Module = module_name, Variable = left_out_var,
+             Estimate = est, SE = se, P_value = p, Sig = sig, N = n)
+}
+
+# ------------------------------------------------------------------------------------------
+# Run tests across modules and covariates
+# ------------------------------------------------------------------------------------------
+test_leave_one_out_module <- function(left_out_var, module_name, seed = SEED) {
+  wdat <- make_balancing_weights(df_analysis, module = module_name, drop_var = left_out_var, seed = seed)
+
+  # Restrict to non-missing outcome var and treatment indicator
+  nonmiss <- !is.na(wdat$data[[left_out_var]]) & !is.na(wdat$data$treat_ind)
+  dat_use <- wdat$data[nonmiss, , drop = FALSE]
+  w_use <- wdat$weights[nonmiss]
+
+  if (nrow(dat_use) == 0) {
+    return(data.frame(Module = module_name, Variable = left_out_var,
+                      Estimate = NA_real_, SE = NA_real_, P_value = NA_real_,
+                      Sig = "", N = 0L))
+  }
+
+  # Weighted regression (no Lin adjustment)
+  f <- reformulate("treat_ind", left_out_var)
+  mod <- estimatr::lm_robust(f, data = dat_use, weights = w_use)
+
+  coef_names <- names(coef(mod))
+  coef_name <- if ("treat_indTRUE" %in% coef_names) "treat_indTRUE" else "treat_ind"
+
+  est <- unname(coef(mod)[coef_name])
+  se <- mod$std.error[coef_name]
+  p <- mod$p.value[coef_name]
+  n <- stats::nobs(mod)
+
+  sig <- if (is.na(p)) "" else if (p < 0.001) "***" else if (p < 0.01) "**" else if (p < 0.05) "*" else if (p < 0.10) "+" else ""
+
+  data.frame(Module = module_name, Variable = left_out_var,
+             Estimate = est, SE = se, P_value = p, Sig = sig, N = n)
+}
+
+# ------------------------------------------------------------------------------------------
+# Run tests across modules and covariates
+# ------------------------------------------------------------------------------------------
 modules <- list(
-  primary = df_analysis %>% filter(finished_dv_primary == TRUE),
-  secondary = df_analysis %>% filter(finished_dv_sec == TRUE),
-  therm = df_analysis %>% filter(finished_dv_therm_trans == TRUE)
+  primary = df_analysis %>% dplyr::filter(finished_dv_primary == TRUE),
+  secondary = df_analysis %>% dplyr::filter(finished_dv_sec == TRUE),
+  therm = df_analysis %>% dplyr::filter(finished_dv_therm_trans == TRUE)
 )
 
-# Run leave-one-out tests for each module and each covariate
 loo_results_all <- data.frame()
 
 for (module_name in names(modules)) {
-  cat(sprintf("Testing %s outcome module (N=%d)...\n",
-              module_name, nrow(modules[[module_name]])))
-
-  module_data <- modules[[module_name]] %>%
-    select(all_of(c("treat_ind", all_covariates)))
-
+  cat(sprintf("Testing %s outcome module (N=%d)...\n", module_name, nrow(modules[[module_name]])))
   for (var in all_covariates) {
-    result <- tryCatch(
-      test_leave_one_out_module(var, module_data, module_name),
+    res <- tryCatch(
+      test_leave_one_out_module(var, module_name, seed = SEED),
       error = function(e) {
-        cat(sprintf("  Error testing %s: %s\n", var, e$message))
+        cat(sprintf("  Error testing %s in %s: %s\n", var, module_name, e$message))
         data.frame(Module = module_name, Variable = var,
-                  Estimate = NA, SE = NA, P_value = NA, Sig = "",
-                  N = NA)
+                   Estimate = NA_real_, SE = NA_real_, P_value = NA_real_,
+                   Sig = "", N = NA_integer_)
       }
     )
-    loo_results_all <- rbind(loo_results_all, result)
-  }
-}
+    loo_results_all <- dplyr::bind_rows(loo_results_all, res)
+  }}
 
 # Create formatted table
 loo_latex <- loo_results_all %>%
-  mutate(
-    Diff_SE = sprintf("%.3f (%.3f)%s", Estimate, SE, Sig),
-    P_value_fmt = sprintf("%.7f", P_value)
-  ) %>%
-  select(Module, Variable, Diff_SE, P_value_fmt, N)
+    dplyr::mutate(
+      Diff_SE     = sprintf("%.3f (%.3f)%s", Estimate, SE, Sig),
+      P_value_fmt = sprintf("%.7f", P_value)
+    ) %>%
+    dplyr::select(Module, Variable, Diff_SE, P_value_fmt, N)
 
 # Write LaTeX table
-sink("../tables/placebo_leave_one_out.tex")
+sink("./tables/placebo_leave_one_out.tex")
 cat("\\begin{table*}[!htbp]\n")
 cat("\\centering\n")
 cat("\\caption{Placebo: weighted treated--control differences in pre-treatment covariates (held-out from GRF)}\n")
@@ -279,7 +368,7 @@ for (outcome in placebo_outcomes) {
 
 
 # Generate LaTeX table for placebo outcomes
-sink("../tables/placebo_outcomes.tex")
+sink("./tables/placebo_outcomes.tex")
 cat("\\begin{tabular}{lcccc}\n")
 cat("\\toprule\n")
 cat("Outcome & Model & Estimate & SE & P-value \\\\\n")
