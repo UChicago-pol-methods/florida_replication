@@ -63,7 +63,7 @@ setDT(df)[big_data, sender_text:= i.sender_text,  on = .(sender_id, section,sect
 df_wide <- df %>%
   select(-c(chatbot_text_seq,chatbot_text,redirection_id,redirection_section, timestamp_utc)) %>%
   group_by(sender_id) %>%
-  pivot_wider(names_from = c(section, section_id), values_from = sender_text)
+  pivot_wider(names_from = c(section, section_id), values_from = sender_text, values_fn = list)
 
 # --------------------------------------- Reorder Columns ---------------------------------------
 # Use column names from a JSON file for reordering
@@ -384,8 +384,8 @@ finish_rate_treatment<-n_complete_treatment_rows/n_treatment_group*100
 summary_table <- data.frame(
   Group = c("Pre-survey","Control", "Treatment"),
   N = c(pre_survey_n, n_control_group, n_treatment_group),
-  "Percent of Group" = c("NA", percent_control, percent_treatment),
-  "Finish rate" = c(pre_survey_finish_rate, finish_rate_control,finish_rate_treatment )
+  "Percent of Group" = c("NA", round(percent_control, 2), round(percent_treatment, 2)),
+  "Finish rate" = c(round(pre_survey_finish_rate, 2), round(finish_rate_control, 2), round(finish_rate_treatment, 2))
 )
 
 summary_table_latex <- xtable(summary_table, caption = "Attrition Summary")
