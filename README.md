@@ -55,8 +55,8 @@ mkdir -p ../figures  # Create figures directory if it doesn't exist
 Rscript figures.R
 ```
 **Outputs**:
-- `/figures/treatment_effects.png` - Treatment effects plot for all respondents (3 outcomes × 3 models)
-- `/figures/treatment_effects_by_subgroup.png` - Treatment effects by party affiliation (Overall, Democrats, Republicans, Independents)
+- `/figures/Figure1_treatment_effects.png/.tiff` - Treatment effects plot for all respondents (3 outcomes × 3 models)
+- `/figures/FigureSI2_treatment_effects_by_subgroup.png/.tiff` - Treatment effects by party affiliation (Overall, Democrats, Republicans, Independents)
 
 ### Step 5: Generate Codebook (Optional)
 ```bash
