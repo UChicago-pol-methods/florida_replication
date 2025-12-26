@@ -68,7 +68,7 @@ ggplot(mod_data, aes(ydist = distributional::dist_normal(estimate, std_error),
     legend.title = element_blank()
   )
 
-ggsave("../figures/treatment_effects.png", width = 10, height = 5, dpi = 300)
+ggsave("../figures/Figure1_treatment_effects.tiff", width = 10, height = 5, dpi = 600, compression = "lzw")
 
 # by subgroups
 
@@ -188,7 +188,7 @@ ggplot(mod_data, aes(ydist = distributional::dist_normal(estimate, std_error),
 
 
 # Save figure
-ggsave("../figures/treatment_effects_by_subgroup.png", width = 10, height = 5, dpi = 300)
+ggsave("../figures/Figure2_treatment_effects_by_subgroup.tiff", width = 10, height = 5, dpi = 600, compression = "lzw")
 
 
 
