@@ -12,7 +12,7 @@ library(tidyr)
 set.seed(60637)
 
 # --------------------------------------- Read Data ---------------------------------------
-df_analysis <- readRDS("./data/df_for_analysis_processed.rds")
+df_analysis <- readRDS("../data/df_for_analysis_processed.rds")
 
 # --------------------------------------- Define Variables ---------------------------------------
 # Post-treatment response measures

@@ -1,5 +1,8 @@
 # Load data, packages and functions
 source('./utils.R')
+# OPTION: Set to TRUE to use existing bootstrap files if they exist, FALSE to always regenerate
+USE_EXISTING_BOOTSTRAP <- TRUE  # Change to FALSE to force regeneration
+
 
 # ------------------------------- Data Preparation -------------------------------
 dataset_list <- list(
@@ -47,6 +50,7 @@ fit_models_and_extract_estimates <- function(outcome_var, attrition, data) {
 }
 
 # ------------------------------- Bootstrapping Analysis -------------------------------
+
 # function to perform bootstrapping and estimate effects
 bootstrap_estimate <- function(data, indices) {
   sampled_data <- data[indices, ]
@@ -58,16 +62,29 @@ bootstrap_estimate <- function(data, indices) {
   c(estimate_results_tlr, estimate_results_law, estimate_results_therm)
 }
 
-# bootstrapping
-set.seed(60637)
-boot_results_upper <- boot(dataset_list$df_upper_bound, bootstrap_estimate, R = 1e4)
-saveRDS(boot_results_upper, "../data/boot_UB.rds")
-#cat("Upper bound bootstrapping completed.\n")
+# Check if bootstrap files exist and whether to use them
+upper_file <- "../data/boot_UB.rds"
+lower_file <- "../data/boot_LB.rds"
 
-set.seed(60637)
-boot_results_lower <- boot(dataset_list$df_lower_bound, bootstrap_estimate, R = 1e4)
-saveRDS(boot_results_lower, "../data/boot_LB.rds")
-#cat("Lower bound bootstrapping completed.\n")
+if (USE_EXISTING_BOOTSTRAP && file.exists(upper_file) && file.exists(lower_file)) {
+  cat("Loading existing bootstrap results from files...\n")
+  boot_results_upper <- readRDS(upper_file)
+  boot_results_lower <- readRDS(lower_file)
+  cat("Bootstrap results loaded successfully.\n")
+} else {
+  cat("Generating new bootstrap results (this may take a while)...\n")
+  
+  # bootstrapping
+  set.seed(60637)
+  boot_results_upper <- boot(dataset_list$df_upper_bound, bootstrap_estimate, R = 1e4)
+  saveRDS(boot_results_upper, upper_file)
+  cat("Upper bound bootstrapping completed and saved.\n")
+  
+  set.seed(60637)
+  boot_results_lower <- boot(dataset_list$df_lower_bound, bootstrap_estimate, R = 1e4)
+  saveRDS(boot_results_lower, lower_file)
+  cat("Lower bound bootstrapping completed and saved.\n")
+}
 
 # ------------------------------- Confidence Interval Calculation -------------------------------
 ci_upper_list <- list()
@@ -174,7 +191,7 @@ latex_table <- combined_df %>%
   select(-Outcome) %>%
   kable(format = "latex", booktabs = TRUE, escape = FALSE, 
         align = c('l', 'c', 'c', 'c'),
-        col.names = c("Method", "Lower Bound", "Upper Bound", "95% CI"),
+        col.names = c("Method", "Lower Bound", "Upper Bound", "95\\% CI"),
         linesep = "") %>%
   pack_rows("Feelings towards transgender", 1, 3, bold = FALSE, italic = TRUE, indent = FALSE) %>%
   pack_rows("Transgender tolerance scale", 4, 6, bold = FALSE, italic = TRUE, indent = FALSE) %>%

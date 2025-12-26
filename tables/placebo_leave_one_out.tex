@@ -1,53 +1,68 @@
-\begin{table*}[!htbp]
-\centering
-\caption{Placebo: weighted treated--control differences in pre-treatment covariates (held-out from GRF)}
-\label{tab:placebo_weighting}
-\centering
-\begin{tabular}[t]{llccc}
+\begin{tabular}{llccc}
 \toprule
-Module & Variable & Diff (SE) & p-value & N\\
+Module & Covariate & Estimate & p-value & N \\
 \midrule
-primary & age\_t0 & -0.715 (0.419)+ & 0.0880487 & 4162\\
-primary & gender\_t0 & -0.003 (0.016) & 0.8658073 & 4162\\
-primary & ideology\_t0 & 0.029 (0.058) & 0.6131939 & 4162\\
-primary & pid\_t0 & 0.003 (0.064) & 0.9577162 & 4162\\
-primary & pol\_interest\_t0 & 0.020 (0.029) & 0.4907483 & 4162\\
+primary & Age & -0.724+ & 0.085 & 4162 \\
+ & & (0.421) & & \\
+primary & Gender (Male) & -0.004 & 0.802 & 4162 \\
+ & & (0.016) & & \\
+primary & Ideology & 0.021 & 0.721 & 4162 \\
+ & & (0.058) & & \\
+primary & Party ID & -0.005 & 0.933 & 4162 \\
+ & & (0.064) & & \\
+primary & Political Interest & 0.020 & 0.489 & 4162 \\
+ & & (0.029) & & \\
+primary & Climate Concern & -0.109 & 0.344 & 4162 \\
+ & & (0.115) & & \\
+primary & Religiosity & -0.028 & 0.227 & 4162 \\
+ & & (0.023) & & \\
+primary & Immigration Attitudes & 0.015 & 0.598 & 4162 \\
+ & & (0.028) & & \\
+primary & Healthcare Importance & 0.007 & 0.812 & 4123 \\
+ & & (0.029) & & \\
+primary & Abortion Importance & -0.023 & 0.392 & 4097 \\
+ & & (0.027) & & \\
 \addlinespace
-primary & climate\_t0 & -0.090 (0.115) & 0.4348660 & 4162\\
-primary & religion\_t0 & -0.027 (0.023) & 0.2472770 & 4162\\
-primary & immigration\_t0 & 0.015 (0.028) & 0.5811960 & 4162\\
-primary & healthcare\_t0 & 0.004 (0.029) & 0.8846464 & 4123\\
-primary & abortion\_t0 & -0.022 (0.027) & 0.4101547 & 4097\\
+secondary & Age & -0.779+ & 0.060 & 4302 \\
+ & & (0.415) & & \\
+secondary & Gender (Male) & -0.001 & 0.942 & 4302 \\
+ & & (0.015) & & \\
+secondary & Ideology & 0.034 & 0.548 & 4302 \\
+ & & (0.057) & & \\
+secondary & Party ID & -0.003 & 0.961 & 4302 \\
+ & & (0.062) & & \\
+secondary & Political Interest & 0.014 & 0.617 & 4302 \\
+ & & (0.029) & & \\
+secondary & Climate Concern & -0.128 & 0.257 & 4302 \\
+ & & (0.113) & & \\
+secondary & Religiosity & -0.032 & 0.161 & 4302 \\
+ & & (0.023) & & \\
+secondary & Immigration Attitudes & 0.005 & 0.855 & 4302 \\
+ & & (0.027) & & \\
+secondary & Healthcare Importance & 0.012 & 0.682 & 4259 \\
+ & & (0.029) & & \\
+secondary & Abortion Importance & -0.016 & 0.549 & 4228 \\
+ & & (0.027) & & \\
 \addlinespace
-secondary & age\_t0 & -0.763 (0.413)+ & 0.0648332 & 4302\\
-secondary & gender\_t0 & -0.000 (0.015) & 0.9936415 & 4302\\
-secondary & ideology\_t0 & 0.030 (0.057) & 0.5959473 & 4302\\
-secondary & pid\_t0 & -0.001 (0.062) & 0.9892266 & 4302\\
-secondary & pol\_interest\_t0 & 0.013 (0.029) & 0.6571022 & 4302\\
-\addlinespace
-secondary & climate\_t0 & -0.118 (0.112) & 0.2948256 & 4302\\
-secondary & religion\_t0 & -0.030 (0.023) & 0.1931653 & 4302\\
-secondary & immigration\_t0 & 0.006 (0.027) & 0.8195609 & 4302\\
-secondary & healthcare\_t0 & 0.012 (0.029) & 0.6805412 & 4259\\
-secondary & abortion\_t0 & -0.015 (0.027) & 0.5660140 & 4228\\
-\addlinespace
-therm & age\_t0 & -0.825 (0.410)* & 0.0444094 & 4345\\
-therm & gender\_t0 & -0.002 (0.015) & 0.8865155 & 4345\\
-therm & ideology\_t0 & 0.033 (0.056) & 0.5593493 & 4345\\
-therm & pid\_t0 & 0.000 (0.062) & 0.9994510 & 4345\\
-therm & pol\_interest\_t0 & 0.014 (0.028) & 0.6131212 & 4345\\
-\addlinespace
-therm & climate\_t0 & -0.099 (0.111) & 0.3735849 & 4345\\
-therm & religion\_t0 & -0.034 (0.023) & 0.1331200 & 4345\\
-therm & immigration\_t0 & 0.009 (0.027) & 0.7362338 & 4345\\
-therm & healthcare\_t0 & 0.008 (0.029) & 0.7669016 & 4297\\
-therm & abortion\_t0 & -0.018 (0.027) & 0.5075378 & 4265\\
+therm & Age & -0.831* & 0.043 & 4345 \\
+ & & (0.411) & & \\
+therm & Gender (Male) & -0.002 & 0.873 & 4345 \\
+ & & (0.015) & & \\
+therm & Ideology & 0.034 & 0.544 & 4345 \\
+ & & (0.056) & & \\
+therm & Party ID & 0.004 & 0.954 & 4345 \\
+ & & (0.062) & & \\
+therm & Political Interest & 0.017 & 0.554 & 4345 \\
+ & & (0.029) & & \\
+therm & Climate Concern & -0.102 & 0.361 & 4345 \\
+ & & (0.112) & & \\
+therm & Religiosity & -0.036 & 0.117 & 4345 \\
+ & & (0.023) & & \\
+therm & Immigration Attitudes & 0.006 & 0.811 & 4345 \\
+ & & (0.027) & & \\
+therm & Healthcare Importance & 0.010 & 0.718 & 4297 \\
+ & & (0.028) & & \\
+therm & Abortion Importance & -0.018 & 0.493 & 4265 \\
+ & & (0.027) & & \\
 \bottomrule
-\end{tabular}\\
-{\raggedright
-\small
-
-    Note: $^{***} p<0.001$, $^{**} p<0.01$, $^* p<0.05$, $^+ p<0.1$. Included are respondents for whom we collected complete post-test response. 
-    
-}
-\end{table*}
+\end{tabular}
